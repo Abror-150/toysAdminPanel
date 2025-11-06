@@ -68,7 +68,7 @@ export default function FurnituresList() {
           </h1>{" "}
           <p className="text-muted-foreground mt-1">
             Manage furniture items across all nabors
-          </p>{" "}
+          </p>
         </div>
         <Button
           onClick={() => navigate("/furnitures/new")}
@@ -78,7 +78,7 @@ export default function FurnituresList() {
           <Plus className="w-4 h-4 mr-2" /> Add Furniture{" "}
         </Button>{" "}
       </div>
-      ```
+      
       <Card>
         <Table>
           <TableHeader>
