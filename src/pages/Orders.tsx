@@ -1,11 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
-import { Eye, Filter } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { orderApi } from '@/services/api';
-import { Order } from '@/types';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -13,67 +12,42 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-
-// Mock data
-const mockOrders: Order[] = [
-  {
-    id: '1',
-    customerName: 'Sarah Johnson',
-    phone: '+1 234 567 8900',
-    totalPrice: 299.99,
-    status: 'completed',
-    createdAt: '2024-06-15T10:30:00Z',
-    items: [
-      { id: '1', naborName: 'Classic Mahidoll', quantity: 1, price: 299.99 }
-    ],
-  },
-  {
-    id: '2',
-    customerName: 'Michael Chen',
-    phone: '+1 234 567 8901',
-    totalPrice: 599.98,
-    status: 'processing',
-    createdAt: '2024-06-14T15:20:00Z',
-    items: [
-      { id: '2', naborName: 'Premium Collection', quantity: 2, price: 299.99 }
-    ],
-  },
-  {
-    id: '3',
-    customerName: 'Emma Williams',
-    phone: '+1 234 567 8902',
-    totalPrice: 449.99,
-    status: 'pending',
-    createdAt: '2024-06-13T09:15:00Z',
-    items: [
-      { id: '3', naborName: 'Deluxe Edition', quantity: 1, price: 449.99 }
-    ],
-  },
-];
-
-const statusColors = {
-  pending: 'bg-yellow-500',
-  processing: 'bg-blue-500',
-  completed: 'bg-green-500',
-  cancelled: 'bg-red-500',
-};
+} from "@/components/ui/select";
+import axios from "axios";
+import { API } from "@/hooks/getEnv";
 
 export default function Orders() {
-  const { data: orders, isLoading } = useQuery({
-    queryKey: ['orders'],
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+
+  const { data: ordersData, isLoading } = useQuery({
+    queryKey: ["orders"],
     queryFn: async () => {
-      // In production: const response = await orderApi.getAll();
-      // return response.data;
-      return mockOrders;
+      const res = await axios.get(`${API}/order`);
+      return res.data;
     },
+  });
+
+  const { data: orderDetail, isLoading: isDetailLoading } = useQuery({
+    queryKey: ["orderDetail", selectedOrderId],
+    queryFn: async () => {
+      const res = await axios.get(`${API}/order/${selectedOrderId}`);
+      return res.data;
+    },
+    enabled: !!selectedOrderId,
   });
 
   if (isLoading) {
@@ -84,13 +58,25 @@ export default function Orders() {
     );
   }
 
+  const {
+    totalOrders,
+    statusCounts,
+    data: orders,
+  } = ordersData || {
+    totalOrders: 0,
+    statusCounts: {},
+    data: [],
+  };
+
   return (
     <div className="p-6 space-y-6 animate-fade-in">
-      {/* Header */}
+      {/* Header va Filter */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Orders</h1>
-          <p className="text-muted-foreground mt-1">Manage customer orders and track status</p>
+          <p className="text-muted-foreground mt-1">
+            Manage customer orders and track status
+          </p>
         </div>
         <div className="flex gap-3">
           <Select defaultValue="all">
@@ -100,15 +86,16 @@ export default function Orders() {
             <SelectContent>
               <SelectItem value="all">All Orders</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="processing">Processing</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="confirmed">Confirmed</SelectItem>
+              <SelectItem value="shipped">Shipped</SelectItem>
+              <SelectItem value="delivered">Delivered</SelectItem>
               <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      {/* Orders Table */}
+      {/* Orders table */}
       <Card>
         <Table>
           <TableHeader>
@@ -124,16 +111,18 @@ export default function Orders() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders?.map((order) => (
+            {orders?.map((order: any) => (
               <TableRow key={order.id}>
-                <TableCell className="font-mono text-sm">#{order.id}</TableCell>
-                <TableCell className="font-medium">{order.customerName}</TableCell>
-                <TableCell className="text-muted-foreground">{order.phone}</TableCell>
+                <TableCell className="font-mono text-sm">{order.id}</TableCell>
+                <TableCell className="font-medium">{order.fullName}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {order.phoneNumber}
+                </TableCell>
                 <TableCell>
                   <div className="space-y-1">
-                    {order.items.map(item => (
+                    {order.orderItems.map((item: any) => (
                       <div key={item.id} className="text-sm">
-                        {item.naborName} x{item.quantity}
+                        {item.nabor.name_uz} x{item.quantity}
                       </div>
                     ))}
                   </div>
@@ -142,7 +131,7 @@ export default function Orders() {
                   ${order.totalPrice.toFixed(2)}
                 </TableCell>
                 <TableCell>
-                  <Badge className={statusColors[order.status]}>
+                  <Badge className={statusCounts[order.status]}>
                     {order.status}
                   </Badge>
                 </TableCell>
@@ -150,7 +139,11 @@ export default function Orders() {
                   {new Date(order.createdAt).toLocaleDateString()}
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button size="sm" className="bg-gradient-primary">
+                  <Button
+                    size="sm"
+                    className="bg-gradient-primary"
+                    onClick={() => setSelectedOrderId(order.id)}
+                  >
                     <Eye className="w-4 h-4 mr-2" />
                     View
                   </Button>
@@ -161,31 +154,84 @@ export default function Orders() {
         </Table>
       </Card>
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <Card className="p-6 border-border/50">
-          <p className="text-sm font-medium text-muted-foreground">Total Orders</p>
-          <p className="text-2xl font-bold text-foreground mt-2">{orders?.length || 0}</p>
+          <p className="text-sm font-medium text-muted-foreground">
+            Total Orders
+          </p>
+          <p className="text-2xl font-bold text-foreground mt-2">
+            {totalOrders}
+          </p>
         </Card>
         <Card className="p-6 border-border/50">
           <p className="text-sm font-medium text-muted-foreground">Pending</p>
           <p className="text-2xl font-bold text-foreground mt-2">
-            {orders?.filter(o => o.status === 'pending').length || 0}
+            {statusCounts.pending || 0}
           </p>
         </Card>
         <Card className="p-6 border-border/50">
-          <p className="text-sm font-medium text-muted-foreground">Processing</p>
+          <p className="text-sm font-medium text-muted-foreground">Confirmed</p>
           <p className="text-2xl font-bold text-foreground mt-2">
-            {orders?.filter(o => o.status === 'processing').length || 0}
+            {statusCounts.confirmed || 0}
           </p>
         </Card>
         <Card className="p-6 border-border/50">
-          <p className="text-sm font-medium text-muted-foreground">Completed</p>
+          <p className="text-sm font-medium text-muted-foreground">Shipped</p>
           <p className="text-2xl font-bold text-foreground mt-2">
-            {orders?.filter(o => o.status === 'completed').length || 0}
+            {statusCounts.shipped || 0}
+          </p>
+        </Card>
+        <Card className="p-6 border-border/50">
+          <p className="text-sm font-medium text-muted-foreground">Delivered</p>
+          <p className="text-2xl font-bold text-foreground mt-2">
+            {statusCounts.delivered || 0}
           </p>
         </Card>
       </div>
+
+      {/* Modal */}
+      <Dialog
+        open={!!selectedOrderId}
+        onOpenChange={() => setSelectedOrderId(null)}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Order Details</DialogTitle>
+            {isDetailLoading ? (
+              <Skeleton className="h-20 rounded-lg mt-2" />
+            ) : (
+              <DialogDescription className="space-y-2 mt-2">
+                <p>
+                  <strong>Customer:</strong> {orderDetail?.fullName}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {orderDetail?.phoneNumber}
+                </p>
+                <p>
+                  <strong>Status:</strong> {orderDetail?.status}
+                </p>
+                <p>
+                  <strong>Total:</strong> ${orderDetail?.totalPrice.toFixed(2)}
+                </p>
+                <div>
+                  <strong>Items:</strong>
+                  <ul className="list-disc list-inside">
+                    {orderDetail?.orderItems.map((item: any) => (
+                      <li key={item.id}>
+                        {item.nabor.name_uz} x{item.quantity}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </DialogDescription>
+            )}
+          </DialogHeader>
+          <div className="flex justify-end mt-4">
+            <Button onClick={() => setSelectedOrderId(null)}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

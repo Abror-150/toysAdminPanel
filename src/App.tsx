@@ -10,7 +10,6 @@ import Dashboard from "./pages/Dashboard";
 import NaborForm from "./pages/NaborForm";
 import Nabors from "./pages/Nabors";
 import Contacts from "./pages/Contacts";
-import Statistics from "./pages/Statistics";
 import Orders from "./pages/Orders";
 import MaterialsList from "./pages/MaterialsList";
 import MaterialForm from "./pages/MaterialForm";
@@ -55,7 +54,6 @@ const App = () => (
                   <Route path="/andozalar/:id" element={<AndozaForm />} />
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/orders" element={<Orders />} />
-                  <Route path="/statistics" element={<Statistics />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </main>

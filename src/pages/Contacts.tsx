@@ -1,19 +1,24 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Mail, Trash2, Eye, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { contactApi } from '@/services/api';
-import { Contact } from '@/types';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useState } from "react";
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { Mail, Trash2, Eye, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { contactApi } from "@/services/api";
+import { Contact } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -21,45 +26,30 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-
-// Mock data
-const mockContacts: Contact[] = [
-  {
-    id: '1',
-    name: 'Sarah Johnson',
-    email: 'sarah@example.com',
-    message: 'I am interested in the Premium Collection. Can you provide more details about the materials used?',
-    createdAt: '2024-06-15T10:30:00Z',
-    isRead: false,
-  },
-  {
-    id: '2',
-    name: 'Michael Chen',
-    email: 'michael.chen@example.com',
-    message: 'When will the Deluxe Edition be back in stock? I have been waiting for a while.',
-    createdAt: '2024-06-14T15:20:00Z',
-    isRead: true,
-  },
-  {
-    id: '3',
-    name: 'Emma Williams',
-    email: 'emma.w@example.com',
-    message: 'I received my order yesterday. Everything looks great! Thank you for the excellent packaging.',
-    createdAt: '2024-06-13T09:15:00Z',
-    isRead: true,
-  },
-];
+} from "@/components/ui/table";
+import axios from "axios";
+import { API } from "@/hooks/getEnv";
 
 export default function Contacts() {
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [deleteContact, setDeleteContact] = useState<Contact | null>(null);
 
   const { data: contacts, isLoading } = useQuery({
-    queryKey: ['contacts'],
+    queryKey: ["contacts"],
     queryFn: async () => {
-      // In production: const response = await contactApi.getAll();
-      // return response.data;
-      return mockContacts;
+      const res = await axios.get(`${API}/contact`);
+      console.log(res.data);
+      return res.data;
+    },
+  });
+  const queryClient = useQueryClient();
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string | number) => {
+      await axios.delete(`${API}/contact/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      setSelectedContact(null);
     },
   });
 
@@ -73,23 +63,20 @@ export default function Contacts() {
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Contact Messages</h1>
-          <p className="text-muted-foreground mt-1">
-            {contacts?.filter(c => !c.isRead).length || 0} unread messages
-          </p>
+          <h1 className="text-3xl font-bold text-foreground">
+            Contact Messages
+          </h1>
         </div>
         <div className="flex items-center gap-2">
           <Mail className="w-5 h-5 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">
-            Total: {contacts?.length || 0}
+            Total: {contacts?.totalContacts || 0}
           </span>
         </div>
       </div>
 
-      {/* Messages Table */}
       <Card>
         <Table>
           <TableHeader>
@@ -103,10 +90,10 @@ export default function Contacts() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {contacts?.map((contact) => (
-              <TableRow 
+            {contacts?.data?.map((contact: any) => (
+              <TableRow
                 key={contact.id}
-                className={!contact.isRead ? 'bg-accent/30' : ''}
+                className={!contact.isRead ? "bg-accent/30" : ""}
               >
                 <TableCell>
                   {contact.isRead ? (
@@ -115,14 +102,16 @@ export default function Contacts() {
                       Read
                     </Badge>
                   ) : (
-                    <Badge className="bg-gradient-primary">
-                      New
-                    </Badge>
+                    <Badge className="bg-gradient-primary">New</Badge>
                   )}
                 </TableCell>
                 <TableCell className="font-medium">{contact.name}</TableCell>
-                <TableCell className="text-muted-foreground">{contact.email}</TableCell>
-                <TableCell className="max-w-md truncate">{contact.message}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {contact.email}
+                </TableCell>
+                <TableCell className="max-w-md truncate">
+                  {contact.message}
+                </TableCell>
                 <TableCell className="text-muted-foreground">
                   {new Date(contact.createdAt).toLocaleDateString()}
                 </TableCell>
@@ -136,7 +125,11 @@ export default function Contacts() {
                       <Eye className="w-4 h-4 mr-2" />
                       View
                     </Button>
-                    <Button size="sm" variant="destructive">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setDeleteContact(contact)}
+                    >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
@@ -147,29 +140,29 @@ export default function Contacts() {
         </Table>
       </Card>
 
-      {/* Message Detail Dialog */}
-      <Dialog open={!!selectedContact} onOpenChange={() => setSelectedContact(null)}>
-        <DialogContent className="max-w-2xl">
+      <Dialog
+        open={!!deleteContact}
+        onOpenChange={() => setDeleteContact(null)}
+      >
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Message from {selectedContact?.name}</DialogTitle>
+            <DialogTitle>Are you sure?</DialogTitle>
             <DialogDescription>
-              {selectedContact?.email} • {selectedContact && new Date(selectedContact.createdAt).toLocaleString()}
+              Do you really want to delete the message from{" "}
+              {deleteContact?.name}? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <div className="p-4 rounded-lg bg-muted/50 border border-border">
-              <p className="text-foreground whitespace-pre-wrap">{selectedContact?.message}</p>
-            </div>
-          </div>
-          <div className="flex justify-end gap-2">
-            {!selectedContact?.isRead && (
-              <Button className="bg-gradient-primary">
-                <Check className="w-4 h-4 mr-2" />
-                Mark as Read
-              </Button>
-            )}
-            <Button variant="destructive">
-              <Trash2 className="w-4 h-4 mr-2" />
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setDeleteContact(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                deleteContact?.id && deleteMutation.mutate(deleteContact.id);
+                setDeleteContact(null);
+              }}
+            >
               Delete
             </Button>
           </div>

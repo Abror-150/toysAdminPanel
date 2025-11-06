@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus, Edit, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,7 +16,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -23,60 +24,56 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-
-const mockAccessories = [
-  { id: '1', name: 'Pearl Necklace', naborId: '1', naborName: 'Classic Mahidoll' },
-  { id: '2', name: 'Silk Ribbon', naborId: '1', naborName: 'Classic Mahidoll' },
-  { id: '3', name: 'Gold Crown', naborId: '2', naborName: 'Premium Collection' },
-];
+} from "@/components/ui/table";
+import axios from "axios";
+import { API } from "@/hooks/getEnv";
 
 export default function AccessoriesList() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { data: accessories, isLoading } = useQuery({
-    queryKey: ['accessories'],
+  // Get all accessories
+  const {
+    data: accessories,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["accessories"],
     queryFn: async () => {
-      return mockAccessories;
+      const res = await axios.get(`${API}/accessories`);
+      return res.data?.data;
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return Promise.resolve();
+      await axios.delete(`${API}/accessories/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['accessories'] });
-      toast.success('Accessory deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ["accessories"] });
+      toast.success("Accessory deleted successfully");
       setDeleteId(null);
     },
     onError: () => {
-      toast.error('Failed to delete accessory');
+      toast.error("Failed to delete accessory");
     },
   });
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id);
-  };
+  const handleDelete = (id: string) => deleteMutation.mutate(id);
 
-  if (isLoading) {
-    return (
-      <div className="p-6">
-        <Skeleton className="h-96 rounded-xl" />
-      </div>
-    );
-  }
+  if (isLoading) return <Skeleton className="h-96 rounded-xl p-6" />;
+  if (isError)
+    return <div className="p-6 text-red-500">Error loading accessories</div>;
 
   return (
     <div className="p-6 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Accessories</h1>
-          <p className="text-muted-foreground mt-1">Manage accessories across all nabors</p>
-        </div>
-        <Button onClick={() => navigate('/accessories/new')} className="bg-gradient-primary">
+        <h1 className="text-3xl font-bold text-foreground">Accessories</h1>
+        <Button
+          onClick={() => navigate("/accessories/new")}
+          className="bg-gradient-primary"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Add Accessory
         </Button>
@@ -86,30 +83,35 @@ export default function AccessoriesList() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
+              <TableHead>Name (UZ)</TableHead>
+              <TableHead>Name (RU)</TableHead>
+              <TableHead>Name (EN)</TableHead>
               <TableHead>Nabor</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {accessories?.map((accessory) => (
-              <TableRow key={accessory.id}>
-                <TableCell className="font-medium">{accessory.name}</TableCell>
-                <TableCell className="text-muted-foreground">{accessory.naborName}</TableCell>
+            {accessories?.map((item: any) => (
+              <TableRow key={item.id}>
+                <TableCell>{item.name_uz}</TableCell>
+                <TableCell>{item.name_ru}</TableCell>
+                <TableCell>{item.name_en}</TableCell>
+                <TableCell className="text-muted-foreground">
+                  {item.nabor?.name_uz || "—"}
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button
                       size="sm"
-                      onClick={() => navigate(`/accessories/${accessory.id}`)}
+                      onClick={() => navigate(`/accessories/${item.id}`)}
                       className="bg-gradient-primary"
                     >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
+                      <Edit className="w-4 h-4 mr-2" /> Edit
                     </Button>
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => setDeleteId(accessory.id)}
+                      onClick={() => setDeleteId(item.id)}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -121,12 +123,14 @@ export default function AccessoriesList() {
         </Table>
       </Card>
 
+      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the accessory.
+              This action cannot be undone. This will permanently delete the
+              accessory.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

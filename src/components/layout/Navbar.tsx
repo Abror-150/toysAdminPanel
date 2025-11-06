@@ -1,7 +1,7 @@
-import { Moon, Sun, Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useTheme } from '@/hooks/useTheme';
+import { Moon, Sun, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useTheme } from "@/hooks/useTheme";
 
 export function Navbar() {
   const { theme, toggleTheme } = useTheme();
@@ -21,7 +21,7 @@ export function Navbar() {
             onClick={toggleTheme}
             className="rounded-full"
           >
-            {theme === 'dark' ? (
+            {theme === "dark" ? (
               <Sun className="w-5 h-5" />
             ) : (
               <Moon className="w-5 h-5" />

@@ -1,5 +1,5 @@
-import { Card } from '@/components/ui/card';
-import { ReactNode } from 'react';
+import { Card } from "@/components/ui/card";
+import { ReactNode } from "react";
 
 interface ChartCardProps {
   title: string;
@@ -17,9 +17,7 @@ export function ChartCard({ title, children, description }: ChartCardProps) {
             <p className="text-sm text-muted-foreground mt-1">{description}</p>
           )}
         </div>
-        <div className="h-80">
-          {children}
-        </div>
+        <div className="h-80">{children}</div>
       </div>
     </Card>
   );

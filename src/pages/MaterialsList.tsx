@@ -1,12 +1,12 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Edit, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Plus, Edit, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +16,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+} from "@/components/ui/alert-dialog";
 import {
   Table,
   TableBody,
@@ -24,19 +24,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-
-// Mock data
-const mockMaterials = [
-  { id: '1', type: 'TRIKOTAJ', description: 'High quality cotton blend fabric', naborId: '1', naborName: 'Classic Mahidoll' },
-  { id: '2', type: 'ASTARLIK', description: 'Soft lining material for comfort', naborId: '1', naborName: 'Classic Mahidoll' },
-  { id: '3', type: 'PAXTALIK', description: 'Premium cotton padding', naborId: '2', naborName: 'Premium Collection' },
-];
+} from "@/components/ui/table";
+import { materialsApi } from "@/services/materialApi";
 
 const materialTypeColors = {
-  TRIKOTAJ: 'bg-blue-500',
-  ASTARLIK: 'bg-green-500',
-  PAXTALIK: 'bg-purple-500',
+  TRIKOTAJ: "bg-blue-500",
+  ASTARLIK: "bg-green-500",
+  PAXTALIK: "bg-purple-500",
 };
 
 export default function MaterialsList() {
@@ -44,27 +38,24 @@ export default function MaterialsList() {
   const queryClient = useQueryClient();
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { data: materials, isLoading } = useQuery({
-    queryKey: ['materials'],
-    queryFn: async () => {
-      // In production: const response = await api.get('/materials');
-      // return response.data;
-      return mockMaterials;
-    },
+  const {
+    data: materials,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["materials"],
+    queryFn: materialsApi.getAll,
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      // In production: await api.delete(`/materials/${id}`);
-      return Promise.resolve();
-    },
+    mutationFn: materialsApi.delete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['materials'] });
-      toast.success('Material deleted successfully');
+      queryClient.invalidateQueries({ queryKey: ["materials"] });
+      toast.success("Material deleted successfully");
       setDeleteId(null);
     },
     onError: () => {
-      toast.error('Failed to delete material');
+      toast.error("Failed to delete material");
     },
   });
 
@@ -80,41 +71,62 @@ export default function MaterialsList() {
     );
   }
 
+  if (isError) {
+    return (
+      <div className="p-6 text-red-500">
+        Error loading materials. Please try again later.
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 space-y-6 animate-fade-in">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Materials</h1>
-          <p className="text-muted-foreground mt-1">Manage materials across all nabors</p>
+          <p className="text-muted-foreground mt-1">
+            Manage materials across all nabors
+          </p>
         </div>
-        <Button onClick={() => navigate('/materials/new')} className="bg-gradient-primary">
+        <Button
+          onClick={() => navigate("/materials/new")}
+          className="bg-gradient-primary"
+        >
           <Plus className="w-4 h-4 mr-2" />
           Add Material
         </Button>
       </div>
 
-      {/* Materials Table */}
       <Card>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Type</TableHead>
-              <TableHead>Description</TableHead>
+              <TableHead>Description (UZ)</TableHead>
               <TableHead>Nabor</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {materials?.map((material) => (
+            {materials?.map((material: any) => (
               <TableRow key={material.id}>
                 <TableCell>
-                  <Badge className={materialTypeColors[material.type as keyof typeof materialTypeColors]}>
+                  <Badge
+                    className={
+                      materialTypeColors[
+                        material.type as keyof typeof materialTypeColors
+                      ] || "bg-gray-400"
+                    }
+                  >
                     {material.type}
                   </Badge>
                 </TableCell>
-                <TableCell className="max-w-md">{material.description}</TableCell>
-                <TableCell className="text-muted-foreground">{material.naborName}</TableCell>
+                <TableCell className="max-w-md">
+                  {material.description_uz || material.description_en}
+                </TableCell>
+                <TableCell className="text-muted-foreground">
+                  {material.nabor?.name_uz || "—"}
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2">
                     <Button
@@ -146,7 +158,8 @@ export default function MaterialsList() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the material.
+              This action cannot be undone. This will permanently delete the
+              material.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
