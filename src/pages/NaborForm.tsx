@@ -17,6 +17,10 @@ export default function NaborForm() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isEdit = !!id;
+  const formatNumber = (value: number | string) => {
+    if (!value) return "";
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  };
 
   const [form, setForm] = useState({
     name_uz: "",
@@ -72,22 +76,39 @@ export default function NaborForm() {
       toast.error("Failed to save nabor");
     },
   });
-
   const handleChange = (field: string, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value.replace(/\D/g, "");
+    const formatted = raw.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    setForm((prev) => ({ ...prev, price: formatted }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name_uz.trim()) {
-      toast.error("Name (UZ) is required");
-      return;
-    }
 
     saveMutation.mutate({
       ...form,
-      price: Number(form.price || 0),
+      price: Number(form.price?.toString().replace(/\s/g, "") || 0),
     });
+  };
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await naborApi.uploadImage(formData);
+      console.log(res.data, "asdgasd");
+      setForm((prev) => ({ ...prev, image: res.data?.compressed }));
+
+      toast.success("Image uploaded successfully");
+    } catch (error) {
+      toast.error("Failed to upload image");
+    }
   };
 
   if (isEdit && isLoading) return <div className="p-6">Loading...</div>;
@@ -152,21 +173,19 @@ export default function NaborForm() {
               <div className="space-y-2">
                 <Label>Price</Label>
                 <Input
-                  type="number"
+                  type="text"
                   value={form.price ?? ""}
-                  onChange={(e) =>
-                    handleChange("price", Number(e.target.value))
-                  }
+                  onChange={handlePriceChange}
                   placeholder="Enter price"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Image URL</Label>
+                <Label>Image</Label>
                 <Input
-                  value={form.image}
-                  onChange={(e) => handleChange("image", e.target.value)}
-                  placeholder="https://example.com/image.jpg"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e)}
                 />
                 {form.image && (
                   <img

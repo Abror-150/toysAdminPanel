@@ -37,6 +37,10 @@ export const naborApi = {
   create: (data: any) => api.post("/nabor", data),
   update: (id: string, data: any) => api.patch(`/nabor/${id}`, data),
   delete: (id: string) => api.delete(`/nabor/${id}`),
+  uploadImage: (formData: FormData) =>
+    axios.post(`${API}/upload`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
 };
 
 export const contactApi = {
