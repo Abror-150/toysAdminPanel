@@ -11,7 +11,6 @@ export function ChartCard({ title, children, description }: ChartCardProps) {
   return (
     <Card className="p-4 sm:p-6 border-border/50">
       <div className="space-y-4">
-        {/* Header */}
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-foreground">
             {title}
@@ -23,7 +22,6 @@ export function ChartCard({ title, children, description }: ChartCardProps) {
           )}
         </div>
 
-        {/* Chart wrapper */}
         <div className="h-56 sm:h-80 w-full overflow-x-auto">{children}</div>
       </div>
     </Card>
