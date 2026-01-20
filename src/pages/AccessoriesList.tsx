@@ -67,44 +67,62 @@ export default function AccessoriesList() {
     return <div className="p-6 text-red-500">Error loading accessories</div>;
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-foreground">Accessories</h1>
+    <div className="p-4 sm:p-6 space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+          Accessories
+        </h1>
         <Button
           onClick={() => navigate("/accessories/new")}
-          className="bg-gradient-primary"
+          className="bg-gradient-primary w-full sm:w-auto"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Accessory
         </Button>
       </div>
 
+      {/* Table */}
       <Card>
-        <Table>
+        <Table className="w-full table-auto">
           <TableHeader>
             <TableRow>
-              <TableHead>Name (UZ)</TableHead>
-              <TableHead>Name (RU)</TableHead>
-              <TableHead>Name (EN)</TableHead>
-              <TableHead>Nabor</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="whitespace-nowrap text-sm">
+                Name (UZ)
+              </TableHead>
+              <TableHead className="whitespace-nowrap text-sm">
+                Name (RU)
+              </TableHead>
+              <TableHead className="whitespace-nowrap text-sm">
+                Name (EN)
+              </TableHead>
+              <TableHead className="whitespace-nowrap text-sm">Nabor</TableHead>
+              <TableHead className="whitespace-nowrap text-right text-sm">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {accessories?.map((item: any) => (
-              <TableRow key={item.id}>
-                <TableCell>{item.name_uz}</TableCell>
-                <TableCell>{item.name_ru}</TableCell>
-                <TableCell>{item.name_en}</TableCell>
-                <TableCell className="text-muted-foreground">
+              <TableRow key={item.id} className="align-top">
+                <TableCell className="truncate max-w-[120px] text-sm">
+                  {item.name_uz}
+                </TableCell>
+                <TableCell className="truncate max-w-[120px] text-sm">
+                  {item.name_ru}
+                </TableCell>
+                <TableCell className="truncate max-w-[120px] text-sm">
+                  {item.name_en}
+                </TableCell>
+                <TableCell className="truncate max-w-[100px] text-muted-foreground text-sm">
                   {item.nabor?.name_uz || "—"}
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
+                  <div className="flex flex-wrap sm:flex-row justify-end gap-2">
                     <Button
                       size="sm"
                       onClick={() => navigate(`/accessories/${item.id}`)}
-                      className="bg-gradient-primary"
+                      className="bg-gradient-primary w-full sm:w-auto text-sm"
                     >
                       <Edit className="w-4 h-4 mr-2" /> Edit
                     </Button>
@@ -112,6 +130,7 @@ export default function AccessoriesList() {
                       size="sm"
                       variant="destructive"
                       onClick={() => setDeleteId(item.id)}
+                      className="w-full sm:w-auto text-sm"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

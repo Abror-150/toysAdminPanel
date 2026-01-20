@@ -79,16 +79,22 @@ export default function Nabors() {
   }
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Nabors</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            Nabors
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Manage your product collection
           </p>
         </div>
-        <div className="flex gap-3">
-          <div className="flex rounded-lg border border-border bg-card">
+
+        {/* Controls */}
+        <div className="flex flex-wrap gap-2 sm:gap-3">
+          {/* Grid/List toggle */}
+          <div className="flex rounded-lg border border-border bg-card overflow-hidden">
             <Button
               variant={viewMode === "grid" ? "secondary" : "ghost"}
               size="icon"
@@ -104,9 +110,11 @@ export default function Nabors() {
               <List className="w-4 h-4" />
             </Button>
           </div>
+
+          {/* Create button */}
           <Button
             onClick={() => navigate("/nabors/new")}
-            className="bg-gradient-primary"
+            className="bg-gradient-primary flex-1 sm:flex-none w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" />
             Create Nabor
@@ -114,8 +122,9 @@ export default function Nabors() {
         </div>
       </div>
 
+      {/* Grid view */}
       {viewMode === "grid" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {nabors?.map((nabor: any) => (
             <Card
               key={nabor.id}
@@ -133,20 +142,20 @@ export default function Nabors() {
                   </Badge>
                 )}
               </div>
-              <div className="p-6 space-y-4">
+              <div className="p-4 sm:p-6 space-y-4 flex flex-col">
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground">
+                  <h3 className="text-lg sm:text-xl font-semibold text-foreground">
                     {nabor.name_uz}
                   </h3>
-                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                  <p className="text-sm sm:text-base text-muted-foreground mt-1 line-clamp-2">
                     {nabor.description_uz}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col sm:flex-row gap-2 mt-auto">
                   <Button
                     size="sm"
                     onClick={() => navigate(`/nabors/${nabor.id}`)}
-                    className="flex-1 bg-gradient-primary"
+                    className="flex-1 bg-gradient-primary w-full sm:w-auto"
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
@@ -155,6 +164,7 @@ export default function Nabors() {
                     size="sm"
                     variant="destructive"
                     onClick={() => setDeleteId(nabor.id)}
+                    className="w-full sm:w-auto"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -165,9 +175,10 @@ export default function Nabors() {
         </div>
       )}
 
+      {/* List view */}
       {viewMode === "list" && (
-        <Card>
-          <Table>
+        <div className="overflow-x-auto">
+          <Table className="min-w-full">
             <TableHeader>
               <TableRow>
                 <TableHead>Image</TableHead>
@@ -189,7 +200,7 @@ export default function Nabors() {
                     />
                   </TableCell>
                   <TableCell className="font-medium">{nabor.name_uz}</TableCell>
-                  <TableCell className="max-w-md truncate">
+                  <TableCell className="max-w-xs truncate">
                     {nabor.description}
                   </TableCell>
                   <TableCell>
@@ -203,11 +214,11 @@ export default function Nabors() {
                     {new Date(nabor.createdAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex flex-col sm:flex-row justify-end gap-2">
                       <Button
                         size="sm"
                         onClick={() => navigate(`/nabors/${nabor.id}`)}
-                        className="bg-gradient-primary"
+                        className="bg-gradient-primary w-full sm:w-auto"
                       >
                         <Edit className="w-4 h-4 mr-2" />
                         Edit
@@ -216,6 +227,7 @@ export default function Nabors() {
                         size="sm"
                         variant="destructive"
                         onClick={() => setDeleteId(nabor.id)}
+                        className="w-full sm:w-auto"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -225,30 +237,8 @@ export default function Nabors() {
               ))}
             </TableBody>
           </Table>
-        </Card>
+        </div>
       )}
-
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Ishongchingiz komilmi</AlertDialogTitle>
-            <AlertDialogDescription>
-              “Bu amalni bekor qilish mumkin emas. Bu nabor va unga tegishli
-              barcha materiallar, aksessuarlar, mebellar va andozalarni doimiy
-              ravishda o‘chirib tashlaydi.”
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteId && handleDelete(deleteId)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              HA
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

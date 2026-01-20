@@ -80,67 +80,69 @@ export default function MaterialsList() {
   }
 
   return (
-    <div className="p-6 space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6 animate-fade-in">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Materials</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            Materials
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Manage materials across all nabors
           </p>
         </div>
+
+        {/* Add button */}
         <Button
           onClick={() => navigate("/materials/new")}
-          className="bg-gradient-primary"
+          className="bg-gradient-primary w-full sm:w-auto"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Material
         </Button>
       </div>
 
+      {/* Table */}
       <Card>
-        <Table>
+        <Table className="w-full table-auto">
           <TableHeader>
             <TableRow>
-              <TableHead>Type</TableHead>
-              <TableHead>Description (UZ)</TableHead>
-              <TableHead>Nabor</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead className="whitespace-nowrap text-sm">Type</TableHead>
+              <TableHead className="whitespace-nowrap text-sm">
+                Description (UZ)
+              </TableHead>
+              <TableHead className="whitespace-nowrap text-sm">Nabor</TableHead>
+              <TableHead className="text-right whitespace-nowrap text-sm">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {materials?.map((material: any) => (
-              <TableRow key={material.id}>
-                <TableCell>
-                  <Badge
-                    className={
-                      materialTypeColors[
-                        material.type as keyof typeof materialTypeColors
-                      ] || "bg-gray-400"
-                    }
-                  >
-                    {material.type}
-                  </Badge>
+              <TableRow key={material.id} className="align-top">
+                <TableCell className="truncate max-w-[80px] text-sm">
+                  {material.type}
                 </TableCell>
-                <TableCell className="max-w-md">
+                <TableCell className="truncate max-w-[150px] text-sm">
                   {material.description_uz || material.description_en}
                 </TableCell>
-                <TableCell className="text-muted-foreground">
+                <TableCell className="truncate max-w-[120px] text-sm">
                   {material.nabor?.name_uz || "—"}
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex justify-end gap-2">
+                  <div className="flex flex-wrap sm:flex-row justify-end gap-2">
                     <Button
                       size="sm"
                       onClick={() => navigate(`/materials/${material.id}`)}
-                      className="bg-gradient-primary"
+                      className="bg-gradient-primary w-full sm:w-auto text-sm"
                     >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Edit
+                      <Edit className="w-4 h-4 mr-2" /> Edit
                     </Button>
                     <Button
                       size="sm"
                       variant="destructive"
                       onClick={() => setDeleteId(material.id)}
+                      className="w-full sm:w-auto text-sm"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
