@@ -27,7 +27,7 @@ export function StatsCard({
         className
       )}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         {/* Text */}
         <div className="space-y-1 sm:space-y-2">
           <p className="text-xs sm:text-sm font-medium text-muted-foreground">
@@ -52,7 +52,7 @@ export function StatsCard({
         </div>
 
         {/* Icon */}
-        <div className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-primary">
+        <div className="flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-primary mt-3 sm:mt-0">
           <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
         </div>
       </div>

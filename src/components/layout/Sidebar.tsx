@@ -3,14 +3,17 @@ import {
   LayoutDashboard,
   Package,
   MessageSquare,
+  BarChart3,
   ShoppingCart,
   Layers,
   Sparkles,
   Sofa,
   FileText,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { title: "Dashboard", icon: LayoutDashboard, path: "/" },
@@ -27,60 +30,62 @@ export function AppSidebar() {
   const { open, setOpen } = useSidebar();
 
   return (
-    <>
-      {open && (
-        <div
-          onClick={() => setOpen(false)}
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
-        />
+    <aside
+      className={cn(
+        "h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 fixed md:relative z-20",
+        open ? "w-64" : "w-20",
+        "md:w-64 md:translate-x-0",
+        "absolute top-0 left-0 transform -translate-x-full md:translate-x-0"
       )}
-
-      <aside
-        className={cn(
-          "fixed inset-y-0 left-0 z-50 flex flex-col bg-sidebar border-r border-sidebar-border transition-transform duration-300",
-          // Mobile
-          "w-64 md:static md:translate-x-0",
-          open ? "translate-x-0" : "-translate-x-full",
-          // Desktop width
-          open ? "md:w-64" : "md:w-20"
-        )}
-      >
-        {/* Header */}
-        <div className="flex h-16 items-center px-6 border-b border-sidebar-border">
+    >
+      <div className="flex flex-col h-full">
+        {/* Sidebar header */}
+        <div className="h-16 flex items-center px-4 sm:px-6 border-b border-sidebar-border justify-between">
           {open ? (
-            <h1 className="text-xl font-bold">Mahidolls</h1>
+            <h1 className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Mahidolls
+            </h1>
           ) : (
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-              M
+            <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center">
+              <span className="text-white font-bold text-sm">M</span>
             </div>
           )}
+
+          {/* Mobile close button */}
+          <div className="md:hidden">
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
+              <Menu className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
 
-        <nav className="flex-1 space-y-1 px-3 py-4">
+        {/* Sidebar nav */}
+        <nav className="flex-1 py-4 space-y-1 px-2 sm:px-3 overflow-y-auto">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
-              onClick={() => setOpen(false)}
               className={({ isActive }) =>
                 cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
-                  "hover:bg-sidebar-accent",
-                  isActive && "bg-sidebar-accent font-medium",
-                  !open && "md:justify-center"
+                  "flex items-center gap-3 px-2 sm:px-3 py-2 rounded-lg transition-all duration-200",
+                  "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  isActive &&
+                    "bg-sidebar-accent text-sidebar-accent-foreground font-medium",
+                  !open && "justify-center"
                 )
               }
             >
-              <item.icon className="h-5 w-5 flex-shrink-0" />
-              {open && <span>{item.title}</span>}
+              <item.icon className="w-4 sm:w-5 h-4 sm:h-5 flex-shrink-0" />
+              {open && <span className="text-sm">{item.title}</span>}
             </NavLink>
           ))}
         </nav>
 
-        <div className="border-t border-sidebar-border p-4 text-xs text-muted-foreground">
+        {/* Sidebar footer */}
+        <div className="p-4 border-t border-sidebar-border text-xs text-sidebar-foreground/60 text-center">
           {open ? "© 2025 Mahidolls" : "v1.0"}
         </div>
-      </aside>
-    </>
+      </div>
+    </aside>
   );
 }

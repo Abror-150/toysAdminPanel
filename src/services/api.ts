@@ -10,10 +10,8 @@ export const api = axios.create({
   },
 });
 
-// Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Add any auth tokens or custom headers here if needed
     return config;
   },
   (error) => {
@@ -21,11 +19,9 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Handle errors globally
     console.error("API Error:", error.response?.data || error.message);
     return Promise.reject(error);
   }

@@ -22,6 +22,7 @@ export function ChartCard({ title, children, description }: ChartCardProps) {
           )}
         </div>
 
+        {/* Chart area responsive */}
         <div className="h-56 sm:h-80 w-full overflow-x-auto">{children}</div>
       </div>
     </Card>
