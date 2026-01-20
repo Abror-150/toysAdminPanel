@@ -117,7 +117,7 @@ export default function Nabors() {
             className="bg-gradient-primary flex-1 sm:flex-none w-full sm:w-auto"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Create Nabor
+            Nabor yaratish
           </Button>
         </div>
       </div>
@@ -158,7 +158,7 @@ export default function Nabors() {
                     className="flex-1 bg-gradient-primary w-full sm:w-auto"
                   >
                     <Edit className="w-4 h-4 mr-2" />
-                    Edit
+                    Mahsulotni o'zgartirish
                   </Button>
                   <Button
                     size="sm"
@@ -221,7 +221,7 @@ export default function Nabors() {
                         className="bg-gradient-primary w-full sm:w-auto"
                       >
                         <Edit className="w-4 h-4 mr-2" />
-                        Edit
+                        Mahsulotni o'zgartirish
                       </Button>
                       <Button
                         size="sm"
@@ -237,8 +237,28 @@ export default function Nabors() {
               ))}
             </TableBody>
           </Table>
+          {/* Delete Confirmation */}
         </div>
       )}
+      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Ishonchingiz komilmi?</AlertDialogTitle>
+            <AlertDialogDescription>
+             Naborni o'chirmoqchimisiz
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => deleteId && handleDelete(deleteId)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              O'chirish
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

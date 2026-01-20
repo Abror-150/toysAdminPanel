@@ -66,13 +66,13 @@ export default function Contacts() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">
-            Contact Messages
+            Contact xabarlar
           </h1>
         </div>
         <div className="flex items-center gap-2">
           <Mail className="w-5 h-5 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">
-            Total: {contacts?.totalContacts || 0}
+            Hammasi: {contacts?.totalContacts || 0}
           </span>
         </div>
       </div>

@@ -79,7 +79,7 @@ export default function Dashboard() {
             Dashboard
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Welcome to Mahidolls Admin Panel
+            Xush kelibsiz Mahidolls Admin Panel ga
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export default function Dashboard() {
             className="bg-gradient-primary flex-1 sm:flex-none"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Create Nabor
+             Nabor yaratish
           </Button>
           <Button
             variant="outline"
@@ -97,7 +97,7 @@ export default function Dashboard() {
             className="flex-1 sm:flex-none"
           >
             <Eye className="w-4 h-4 mr-2" />
-            View Contacts
+             Contactlarni korish
           </Button>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function Dashboard() {
             className="w-full sm:w-auto h-12 text-base flex-1"
           >
             <ShoppingCart className="w-5 h-5 mr-2" />
-            View All Orders
+            Barcha orderlarni korish
           </Button>
           <Button
             onClick={() => navigate("/contacts")}
@@ -145,7 +145,7 @@ export default function Dashboard() {
             className="w-full sm:w-auto h-12 text-base flex-1"
           >
             <MessageSquare className="w-5 h-5 mr-2" />
-            Check Messages
+            Xabarlarni tekshirish
           </Button>
         </div>
       </ChartCard>

@@ -85,10 +85,10 @@ export default function MaterialsList() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-            Materials
+            Materiallar
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground mt-1">
-            Manage materials across all nabors
+          Barcha naborlar bo'ylab materiallarni boshqaring
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export default function MaterialsList() {
           className="bg-gradient-primary w-full sm:w-auto"
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add Material
+           Material qo'shish
         </Button>
       </div>
 
@@ -154,23 +154,21 @@ export default function MaterialsList() {
         </Table>
       </Card>
 
-      {/* Delete Confirmation */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Ishongchingiz komilmi</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              material.
+              Materilalni o'chirmoqchimisiz
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteId && handleDelete(deleteId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              O'chirish
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

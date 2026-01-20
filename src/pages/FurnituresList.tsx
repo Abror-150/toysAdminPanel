@@ -64,10 +64,10 @@ export default function FurnituresList() {
         <div>
           {" "}
           <h1 className="text-3xl font-bold text-foreground">
-            Furnitures
+            Furnituralar
           </h1>{" "}
           <p className="text-muted-foreground mt-1">
-            Manage furniture items across all nabors
+          Barcha naborlar bo'ylab furnituralarni boshqaring
           </p>
         </div>
         <Button
@@ -75,7 +75,7 @@ export default function FurnituresList() {
           className="bg-gradient-primary"
         >
           {" "}
-          <Plus className="w-4 h-4 mr-2" /> Add Furniture{" "}
+          <Plus className="w-4 h-4 mr-2" /> furnitura qoshing{" "}
         </Button>{" "}
       </div>
       
@@ -123,19 +123,18 @@ export default function FurnituresList() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Ishongchingiz komilmi</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              furniture.
+             Mahsulotni o'chirmoqchimisiz
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Bekor qilish</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => deleteId && handleDelete(deleteId)}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              o'chirish
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
